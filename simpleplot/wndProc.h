@@ -1,6 +1,7 @@
 #pragma once
 
 #include "standard.h"
+#include <shobjidl.h> 
 
 
 namespace SimplePlot {
@@ -10,8 +11,10 @@ namespace SimplePlot {
 	inline extern std::map<HWND, bool> terminatePlot = std::map<HWND, bool>();
 	inline extern std::mutex terminatePlotMutex = std::mutex();
 
-
 	namespace wndProc {
 		LRESULT CALLBACK wndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+		void copyWindow(HWND hwnd);
+		void saveWindow(HWND hwnd);
 	}
 }

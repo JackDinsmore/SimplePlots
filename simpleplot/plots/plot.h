@@ -1,10 +1,15 @@
-#pragma once
+#pragma once	
 
 #include "../standard.h"
 #include "../wndProc.h"
 #include "../colors.h"
 #include "../axis.h"
 #include "../stats.h"
+
+
+
+
+
 
 namespace SimplePlot {
 	namespace Plot {
@@ -14,21 +19,16 @@ namespace SimplePlot {
 				id = maxID;
 				maxID++;
 			}
-
-			WPARAM launch();
-
-			void inline kill() {
-				std::lock_guard<std::mutex> guard(SimplePlot::hwndToBitmapMutex);
-				DeleteObject(SimplePlot::hwndToBitmap[hwnd]);
-			}
-
-			Plot(std::string title) : Plot() {
+			inline Plot(std::string title) : Plot() {
 				rename(title);
 			}
-			Plot(std::string title, int cx, int cy) : Plot() {
+			inline Plot(std::string title, int cx, int cy) : Plot() {
 				rename(title);
 				setSize(cx, cy);
 			}
+
+			void launch();
+			void kill();
 
 			inline void setPos(int x, int y) {
 				POINT s = getSize();
@@ -46,7 +46,7 @@ namespace SimplePlot {
 
 			inline POINT getSize() {
 				RECT rect;
-				GetWindowRect(hwnd, &rect);
+				GetClientRect(hwnd, &rect);
 				return { rect.right - rect.left, rect.bottom - rect.top };
 			}
 
@@ -56,22 +56,39 @@ namespace SimplePlot {
 				return { rect.left, rect.top };
 			}
 
+			inline float setFramerate(int framerate_) {
+				if (framerate_ == SP_STATIC && framerate != SP_STATIC) {
+					isolateData();
+				}
+				framerate = framerate_;
+			}
+
 			PLOT_ID id;
 
 		protected:
 			virtual void draw(HDC hdc) = 0;
+			virtual void isolateData() = 0;
+			virtual void deleteData() = 0;
 
 		private:
 			HWND hwnd;
+			HBRUSH clearBrush;
+			Color::Color clearColor = Color::Color::WHITE;
 
 			inline static PLOT_ID maxID = 0;
 
 			void paint();
 			void createBitmap();
+
+			int framerate = SP_DYNAMIC;
+			bool killed = false;
 		};
 	}
 
-	inline WPARAM launch(SimplePlot::Plot::Plot* plt) {
-		return plt->launch();
+	inline void launch(Plot::Plot* plt) {
+		plt->launch();
 	}
+
+	void deletePlot(PLOT_ID plot);
+	void registerPlot(PLOT_ID, Plot::Plot* plt, PLOT_TYPE plotType);
 }

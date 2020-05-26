@@ -1,3 +1,1 @@
-Finish implementing histogram and axis
-
-Actually do simulation
+Line plots
