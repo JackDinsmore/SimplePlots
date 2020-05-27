@@ -153,17 +153,26 @@
   <ItemGroup>
     <ClInclude Include="simpleplot.h" />
     <ClInclude Include="simpleplot\axis.h" />
-    <ClInclude Include="simpleplot\axis.ipp" />
+    <ClInclude Include="simpleplot\canvas.h" />
     <ClInclude Include="simpleplot\colors.h" />
     <ClInclude Include="simpleplot\plots\hist.h" />
+    <ClInclude Include="simpleplot\plots\line.h" />
     <ClInclude Include="simpleplot\plots\plot.h" />
+    <ClInclude Include="simpleplot\plots\series.h" />
     <ClInclude Include="simpleplot\standard.h" />
     <ClInclude Include="simpleplot\stats.h" />
     <ClInclude Include="simpleplot\wndProc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="simpleplot.cpp" />
+    <ClCompile Include="simpleplot\axis.cpp" />
+    <ClCompile Include="simpleplot\canvas.cpp" />
+    <ClCompile Include="simpleplot\colors.cpp" />
+    <ClCompile Include="simpleplot\plots\hist.cpp" />
+    <ClCompile Include="simpleplot\plots\line.cpp" />
     <ClCompile Include="simpleplot\plots\plot.cpp" />
+    <ClCompile Include="simpleplot\plots\series.cpp" />
+    <ClCompile Include="simpleplot\stats.cpp" />
     <ClCompile Include="simpleplot\wndProc.cpp" />
   </ItemGroup>
   <ItemGroup>

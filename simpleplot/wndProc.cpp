@@ -1,7 +1,12 @@
 #include "wndProc.h"
+#include <shobjidl.h>
+
 
 namespace SimplePlot {
 	namespace wndProc {
+		void copyWindow(HWND hwnd);
+		void saveWindow(HWND hwnd);
+
 		LRESULT CALLBACK wndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
 			RECT r;
 			GetWindowRect(hwnd, &r);
@@ -9,8 +14,8 @@ namespace SimplePlot {
 			HDC hdcMem;
 
 			if (message == WM_DESTROY) {
-				std::lock_guard<std::mutex> guard(terminatePlotMutex);
-				terminatePlot[hwnd] = true;
+				std::lock_guard<std::mutex> guard(terminateCanvasMutex);
+				terminateCanvas[hwnd] = true;
 				return 0;
 			}
 

@@ -39,7 +39,13 @@
     <ClInclude Include="simpleplot\stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="simpleplot\axis.ipp">
+    <ClInclude Include="simpleplot\plots\line.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleplot\plots\series.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleplot\canvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -51,6 +57,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="simpleplot\plots\plot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\plots\hist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\plots\line.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\axis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\colors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\plots\series.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleplot\canvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

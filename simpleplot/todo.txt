@@ -1,1 +1,10 @@
-Line plots
+
+Debug the canvas system, which allows multiple graphs to be drawn on the same axes: resolve race conditions.
+
+Delete all the copy and move constructors for the plots
+
+Create documentation
+
+Move the axis numbers to a more reasonable place.
+
+Do a gravitational simulation
