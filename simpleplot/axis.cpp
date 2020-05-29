@@ -152,4 +152,27 @@ namespace SimplePlot {
 		major = 5;
 		minor = 1;
 	}
+
+
+	namespace Axes {
+		int getNumAxes(AXIS_TYPE t) {
+			switch (t) {
+			case AXIS_TYPE::CART_2D:
+				return 2;
+			default:
+				throw std::logic_error("Axis types other than cart 2d are unimplemented");
+				return 0;
+			}
+		}
+		
+		int getNumAxisCorners(AXIS_TYPE t) {
+			switch (t) {
+			case AXIS_TYPE::CART_2D:
+				return 4;
+			default:
+				throw std::logic_error("Axis types other than cart 2d are unimplemented");
+				return 0;
+			}
+		}
+	}
 }

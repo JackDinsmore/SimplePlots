@@ -10,7 +10,7 @@ namespace SimplePlot {
 	namespace Canvas {
 		class Canvas {
 		public:
-			Canvas(std::vector<PLOT_ID> plots_, SimplePlot::STYLE const* style);
+			Canvas(std::vector<PLOT_ID> plots_, std::wstring name, STYLE const* style);
 			~Canvas();
 
 			void setPos(int x, int y);
@@ -24,12 +24,12 @@ namespace SimplePlot {
 			void removePlot(PLOT_ID plotID);
 			void launch();
 			bool isEmpty();
+			void setGridLines(bool state);
 
 			std::string title;
-			std::string* axisTitles;
 
 			HWND hwnd;
-			CANVAS_ID id = NULL;
+			CANVAS_ID id = SP_NULL_CANVAS;
 
 		private:
 			void initWindow();
@@ -45,16 +45,24 @@ namespace SimplePlot {
 			std::vector<PLOT_ID> plots;
 			int framerate = SP_DYNAMIC;
 			AXIS_TYPE axisType;
+
+			int numAxes = 0;
+			int numCorners = 0;
+			std::string* axisTitles;
+			Axis* axes;
 			float* axisLimits;
 			POINT* drawSpace;
-			SimplePlot::STYLE const* style;
-			Axis* axes;
+			std::wstring name;
+
 			bool killed = false;
+			SimplePlot::STYLE const* style;
 		};
 	}
 
-	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, SimplePlot::STYLE const* style = nullptr);
+	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, std::wstring name = L"", SimplePlot::STYLE const* style = nullptr);
 	void deleteCanvas(CANVAS_ID id);
 	void addPlotToCanvas(CANVAS_ID canvasID, PLOT_ID plotID);
 	void removePlotFromCanvas(CANVAS_ID canvasID, PLOT_ID plotID);
+	void setCanvasGridLines(CANVAS_ID canvasID, bool state);
+	void setCanvasFramerate(CANVAS_ID id, int framerate);
 }

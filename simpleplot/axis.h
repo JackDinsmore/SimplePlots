@@ -39,4 +39,9 @@ namespace SimplePlot {
 		HFONT labelFont;
 		HFONT tickFont;
 	};
+
+	namespace Axes {
+		int getNumAxes(AXIS_TYPE t);
+		int getNumAxisCorners(AXIS_TYPE t);
+	}
 }

@@ -7,8 +7,8 @@
 
 namespace SimplePlot::Hist {
 	template<typename Y>
-	Hist<Y>::Hist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, bool normal) 
-		: Plot(PLOT_TYPE::HISTOGRAM, AXIS_TYPE::CART_2D), data(data), sizeData(sizeData), numBins(numBins),
+	Hist<Y>::Hist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, STYLE const* style, bool normal)
+		: Plot(PLOT_TYPE::HISTOGRAM, AXIS_TYPE::CART_2D, style), data(data), sizeData(sizeData), numBins(numBins),
 		normal(normal), maxBin(maxBin), minBin(minBin) {
 		if (minBin >= maxBin) {
 			throw std::invalid_argument("minBin must be < maxBin");
@@ -16,8 +16,8 @@ namespace SimplePlot::Hist {
 	}
 
 	template<typename Y>
-	Hist<Y>::Hist(Y* data, int sizeData, Y* leftBins_, int numBins, bool normal)
-		: Plot(PLOT_TYPE::HISTOGRAM, AXIS_TYPE::CART_2D), data(data), sizeData(sizeData), numBins(numBins), normal(normal) {
+	Hist<Y>::Hist(Y* data, int sizeData, Y* leftBins_, int numBins, STYLE const* style, bool normal)
+		: Plot(PLOT_TYPE::HISTOGRAM, AXIS_TYPE::CART_2D, style), data(data), sizeData(sizeData), numBins(numBins), normal(normal) {
 		if (numBins > 2) {
 			throw std::invalid_argument("Num Bins must be >= 2");
 		}
@@ -63,6 +63,8 @@ namespace SimplePlot::Hist {
 	void Hist<Y>::draw(HDC hdc, float const* axisLimits, POINT const* drawSpace) const {
 		// axisLimits: {minX, maxX, minY, maxY}
 		// axisPoints: {origin, endX, endY, farCorner}
+
+		SelectObject(hdc, forePen);
 
 		int* binCounts = new int[numBins];
 		for (int i = 0; i < numBins; i++) {
@@ -128,26 +130,32 @@ namespace SimplePlot::Hist {
 
 namespace SimplePlot {
 	template<typename Y>
-	PLOT_ID makeHist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, bool normal) {
-		SimplePlot::Plot::Plot* plt = new SimplePlot::Hist::Hist(data, sizeData, numBins, minBin, maxBin, normal);
+	PLOT_ID makeHist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, STYLE const* style, bool normal) {
+		if (!style) {
+			style = &Style::grayscale;
+		}
+		SimplePlot::Plot::Plot* plt = new SimplePlot::Hist::Hist(data, sizeData, numBins, minBin, maxBin, style, normal);
 		PLOT_ID id = plt->id;
 		registerPlot(id, plt, PLOT_TYPE::HISTOGRAM);
 		return id;
 	}
 
 	template<typename Y>
-	PLOT_ID makeHist(Y* data, int sizeData, Y* leftBins, int numBins, bool normal) {
-		SimplePlot::Plot::Plot* plt = new SimplePlot::Hist::Hist(data, sizeData, leftBins, numBins, normal);
+	PLOT_ID makeHist(Y* data, int sizeData, Y* leftBins, int numBins, STYLE const* style, bool normal) {
+		if (!style) {
+			style = &Style::grayscale;
+		}
+		SimplePlot::Plot::Plot* plt = new SimplePlot::Hist::Hist(data, sizeData, leftBins, numBins, style, normal);
 		PLOT_ID id = plt->id;
 		registerPlot(id, plt, PLOT_TYPE::HISTOGRAM);
 		return id;
 	}
 
-	template PLOT_ID makeHist<float>(float* data, int sizeData, int numBins, float minBin, float maxBin, bool normal);
-	template PLOT_ID makeHist<double>(double* data, int sizeData, int numBins, double minBin, double maxBin, bool normal);
-	template PLOT_ID makeHist<int>(int* data, int sizeData, int numBins, int minBin, int maxBin, bool normal);
+	template PLOT_ID makeHist<float>(float* data, int sizeData, int numBins, float minBin, float maxBin, STYLE const* style, bool normal);
+	template PLOT_ID makeHist<double>(double* data, int sizeData, int numBins, double minBin, double maxBin, STYLE const* style, bool normal);
+	template PLOT_ID makeHist<int>(int* data, int sizeData, int numBins, int minBin, int maxBin, STYLE const* style, bool normal);
 
-	template PLOT_ID makeHist<float>(float* data, int sizeData, float* leftBins, int numBins, bool normal);
-	template PLOT_ID makeHist<double>(double* data, int sizeData, double* leftBins, int numBins, bool normal);
-	template PLOT_ID makeHist<int>(int* data, int sizeData, int* leftBins, int numBins,bool normal);
+	template PLOT_ID makeHist<float>(float* data, int sizeData, float* leftBins, int numBins, STYLE const* style, bool normal);
+	template PLOT_ID makeHist<double>(double* data, int sizeData, double* leftBins, int numBins, STYLE const* style, bool normal);
+	template PLOT_ID makeHist<int>(int* data, int sizeData, int* leftBins, int numBins, STYLE const* style, bool normal);
 }

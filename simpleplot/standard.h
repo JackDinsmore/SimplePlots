@@ -7,6 +7,11 @@
 #define SP_STATIC -1
 #define SP_BORDER_WIDTH 80
 #define SP_TICK_LENGTH 6
+#define SP_NULL_PLOT -1
+#define SP_NULL_CANVAS -1
+#define SP_X_AXIS 0
+#define SP_Y_AXIS 1
+#define SP_Z_AXIS 2
 
 
 namespace SimplePlot {
@@ -15,7 +20,7 @@ namespace SimplePlot {
 
 	enum class PLOT_TYPE {
 		// Ordered in terms of depth: the lowest numbers are drawn first.
-		NULL_PLOT,
+		SP_NULL_PLOT_TYPE,
 		LINE,
 		SERIES,
 		HISTOGRAM,

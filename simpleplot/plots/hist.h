@@ -7,8 +7,8 @@ namespace SimplePlot::Hist {
 	template<typename Y>
 	class Hist : public SimplePlot::Plot::Plot {
 	public:
-		Hist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, bool normal = false);
-		Hist(Y* data, int sizeData, Y* leftBins_, int numBins, bool normal = false);
+		Hist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, STYLE const* style, bool normal = false);
+		Hist(Y* data, int sizeData, Y* leftBins_, int numBins, STYLE const* style, bool normal = false);
 
 		~Hist();
 
@@ -31,8 +31,8 @@ namespace SimplePlot::Hist {
 
 namespace SimplePlot {
 	template<typename Y>
-	extern PLOT_ID makeHist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, bool normal = false);
+	extern PLOT_ID makeHist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, STYLE const* style = nullptr, bool normal = false);
 
 	template<typename Y>
-	extern PLOT_ID makeHist(Y* data, int sizeData, Y* leftBins, int numBins, bool normal = false);
+	extern PLOT_ID makeHist(Y* data, int sizeData, Y* leftBins, int numBins, STYLE const* style = nullptr, bool normal = false);
 }

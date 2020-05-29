@@ -73,7 +73,10 @@ namespace SimplePlot::Stats {
 
 	template<typename T>
 	std::wstring round(T f, int numDigs) {
-		return std::to_wstring(f);
+		if (f == 0) { return L"0"; }
+		int length = (int)log10(abs(f)) + 1 + numDigs;
+		if (f < 0) { length++; }
+		return std::to_wstring(f).substr(0, length);
 	}
 
 	template std::wstring round<float>(float f, int numDigs);

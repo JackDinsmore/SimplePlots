@@ -1,5 +1,6 @@
 #include "canvas.h"
 #pragma comment(lib, "Shcore.lib")
+#pragma warning(disable:4267)
 
 #include <shellscalingapi.h>
 #include <thread>
@@ -27,7 +28,7 @@ namespace SimplePlot {
 	}
 
 	namespace Canvas {
-		Canvas::Canvas(std::vector<PLOT_ID> plots_, SimplePlot::STYLE const* style) : style(style) {
+		Canvas::Canvas(std::vector<PLOT_ID> plots_, std::wstring name, SimplePlot::STYLE const* style) : name(name), style(style) {
 			id = maxID;
 			maxID++;
 
@@ -62,17 +63,21 @@ namespace SimplePlot {
 		void Canvas::initWindow() {
 			SetProcessDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
 
+			wchar_t name[256];
+			wsprintfW(name, L"Plot %d", id);
+
 			WNDCLASS windowClass = { 0 };
 			windowClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 			windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 			windowClass.hInstance = NULL;
 			windowClass.lpfnWndProc = SimplePlot::wndProc::wndProc;
-			windowClass.lpszClassName = L"Plot in Console";
+			windowClass.lpszClassName = name;
 			windowClass.style = CS_HREDRAW | CS_VREDRAW;
 			if (!RegisterClass(&windowClass)) {
-				MessageBox(NULL, L"Could not register class", L"Error", MB_OK);
+				DWORD err = GetLastError();
+				MessageBox(NULL, (L"Could not register class. Error #" + std::to_wstring(err)).c_str(), L"Error", MB_OK);
 			}
-			hwnd = CreateWindow(L"Plot in Console",
+			hwnd = CreateWindow(name,
 				NULL,
 				WS_OVERLAPPEDWINDOW,
 				CW_USEDEFAULT, CW_USEDEFAULT,
@@ -81,13 +86,10 @@ namespace SimplePlot {
 				NULL,
 				NULL,
 				NULL);
-
 			createBitmap();
 			
 			std::lock_guard<std::mutex> generalGuard(Maps::canvasMapMutex);
 			Maps::canvasHWNDMap[id] = hwnd;
-			Maps::canvasMutexMap[id];
-			Maps::canvasPointerMap[id] = this;
 
 			ShowWindow(hwnd, SW_SHOW);
 		}
@@ -96,11 +98,6 @@ namespace SimplePlot {
 			initWindow();
 
 			MSG messages;
-			RECT r;
-			GetWindowRect(hwnd, &r);
-			InvalidateRect(hwnd, &r, FALSE);
-			PostMessage(hwnd, 1, 0, 0);
-			PostMessage(NULL, 1, 0, 0);
 			while (true) {
 				terminateCanvasMutex.lock();
 				bool killNow = terminateCanvas.find(hwnd) == terminateCanvas.end() || terminateCanvas.at(hwnd);
@@ -194,6 +191,12 @@ namespace SimplePlot {
 		}
 
 		void Canvas::addPlot(PLOT_ID plotID) {
+			CANVAS_ID originalCanvas = getPlotCanvas(plotID);
+			if (originalCanvas != SP_NULL_CANVAS) {
+				removePlotFromCanvas(originalCanvas, plotID);
+			}
+			associatePlot(plotID, id);
+
 			if (plots.size() == 0) {
 				plots.push_back(plotID);
 				axisType = getPlotAxisType(plotID);
@@ -201,10 +204,10 @@ namespace SimplePlot {
 				return;
 			}
 
-			// Insert into a list which is sorted from greatest to least.
+			// Binary insert into a list which is sorted from greatest to least.
 			int thisOrder = (int)getPlotType(plotID);
 			auto begin = plots.begin();
-			auto end = plots.end();
+			auto end = plots.end()-1;
 			int beginOrder = (int)getPlotType(*begin);
 			int endOrder = (int)getPlotType(*end);
 			while (beginOrder != endOrder) {
@@ -220,37 +223,50 @@ namespace SimplePlot {
 				}
 			}
 			if (beginOrder != thisOrder) {
-				throw std::logic_error("Binary insert failed");
+				if (beginOrder < thisOrder) {
+					plots.insert(begin, plotID);
+				}
+				else {
+					plots.insert(end+1, plotID);
+				}
 			}
-			plots.insert(begin, plotID);
-			// Binary search for plot hierarchy.
+			else {
+				plots.insert(begin, plotID);
+			}
 		}
+
 		void Canvas::removePlot(PLOT_ID plotID) {
 			auto it = std::find(plots.begin(), plots.end(), plotID);
 			if (it == plots.end()) {
 				// Plot is not in the canvas
 				return;
 			}
+			disassociatePlot(plotID);
 			plots.erase(it);
 		}
 
 		void Canvas::setAxisType() {
 			switch (axisType) {
 			case AXIS_TYPE::CART_2D:
-				axisTitles = new std::string[2];
-				axisLimits = new float[4];
-				drawSpace = new POINT[4];
-				axes = new Axis[2];
+				numAxes = 2;
+				numCorners = 4;
 				break;
 			default:
 				throw std::logic_error("Axis types other than cart 2d are unimplemented");
 			}
+			numAxes = Axes::getNumAxes(axisType);
+			numCorners = Axes::getNumAxisCorners(axisType);
+			axes = new Axis[numAxes];
+			axisTitles = new std::string[numAxes];
+			axisLimits = new float[numAxes * 2];
+			drawSpace = new POINT[numCorners];
 		}
 
 		void Canvas::draw(HDC hdc) {
-			for (PLOT_ID id : plots) {
-				getPlotAxisLimits(id, axisLimits);
+			for (int i = 0; i < plots.size(); i++) {
+				getPlotAxisLimits(plots[i], axisLimits, i==0);
 			}
+
 			axes[0].setEnds(axisLimits[0], axisLimits[1]);
 			axes[1].setEnds(axisLimits[2], axisLimits[3]);
 
@@ -264,11 +280,15 @@ namespace SimplePlot {
 			drawSpace[1] = { size.x - SP_BORDER_WIDTH, size.y - clearanceHoriz };
 			drawSpace[2] = { clearanceVert, SP_BORDER_WIDTH };
 			drawSpace[3] = { size.x - SP_BORDER_WIDTH, SP_BORDER_WIDTH };
+
 			for (PLOT_ID id : plots) {
 				drawPlot(id, hdc, axisLimits, drawSpace);
 			}
 			axes[0].drawAxis(hdc, drawSpace[0], drawSpace[1], drawSpace[2]);
 			axes[1].drawAxis(hdc, drawSpace[0], drawSpace[2], drawSpace[1]);
+
+			RECT nameRect = { 0, 0, size.x, 80 };
+			DrawText(hdc, name.c_str(), name.size(), &nameRect, DT_CENTER);
 		}
 
 		void Canvas::kill() {
@@ -288,14 +308,27 @@ namespace SimplePlot {
 		bool Canvas::isEmpty() {
 			return plots.size() == 0;
 		}
+
+		void Canvas::setGridLines(bool state) {
+			for (int i = 0; i < numAxes; i++) {
+				axes[i].grid = state;
+			}
+		}
 	}
 
 
-	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, SimplePlot::STYLE const* style) {
+	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, std::wstring name, SimplePlot::STYLE const* style) {
 		// Spawn the update function in a new thread.
-		Canvas::Canvas* canvas = new Canvas::Canvas(plots, style);
+		if (!style) {
+			style = &Style::grayscale;
+		}
+		Canvas::Canvas* canvas = new Canvas::Canvas(plots, name, style);
 		std::thread(&Canvas::Canvas::launch, canvas).detach();
-		return canvas->id;
+		CANVAS_ID id = canvas->id;
+		std::lock_guard<std::mutex> generalGuard(Maps::canvasMapMutex);
+		Maps::canvasMutexMap[id];
+		Maps::canvasPointerMap[id] = canvas;
+		return id;
 	}
 
 	void deleteCanvas(CANVAS_ID id) {
@@ -305,14 +338,21 @@ namespace SimplePlot {
 
 	void addPlotToCanvas(CANVAS_ID canvasID, PLOT_ID plotID) {
 		Maps::CanvasGuard guard(canvasID);
-		removePlotFromCanvas(getPlotCanvas(plotID), plotID);
 		Maps::canvasPointerMap.at(canvasID)->addPlot(plotID);
-		associatePlot(canvasID, plotID);
 	}
 
 	void removePlotFromCanvas(CANVAS_ID canvasID, PLOT_ID plotID) {
 		Maps::CanvasGuard guard(canvasID);
 		Maps::canvasPointerMap.at(canvasID)->removePlot(plotID);
-		disassociatePlot(plotID);
+	}
+
+	void setCanvasGridLines(CANVAS_ID canvasID, bool state) {
+		Maps::CanvasGuard guard(canvasID);
+		Maps::canvasPointerMap.at(canvasID)->setGridLines(state);
+	}
+
+	void setCanvasFramerate(CANVAS_ID id, int framerate) {
+		Maps::CanvasGuard guard(id);
+		Maps::canvasPointerMap.at(id)->setFramerate(framerate);
 	}
 }

@@ -1,10 +1,14 @@
 
-Debug the canvas system, which allows multiple graphs to be drawn on the same axes: resolve race conditions.
 
-Delete all the copy and move constructors for the plots
 
-Create documentation
+Make the graph calculate major and minor axes automatically
+
+See if I need to lock the mutexes every time.
+
+There seems to be a minor memory leak
+
+Sometimes the graphs freeze or don't repaint the whole canvas white.
 
 Move the axis numbers to a more reasonable place.
 
-Do a gravitational simulation
+Create documentation

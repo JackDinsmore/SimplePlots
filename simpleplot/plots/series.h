@@ -4,10 +4,10 @@
 
 
 namespace SimplePlot::Series {
-	template<typename Y>
+	template<typename X, typename Y>
 	class Series : public SimplePlot::Plot::Plot {
 	public:
-		Series(Y* data, int sizeData);
+		Series(X skip, Y* data, int sizeData, STYLE const* style);
 		~Series();
 
 
@@ -17,12 +17,13 @@ namespace SimplePlot::Series {
 		void isolateData() override;
 		void deleteData() override;
 
+		X skip;
 		Y* data;
 		int sizeData;
 	};
 }
 
 namespace SimplePlot {
-	template<typename Y>
-	extern PLOT_ID makeSeries(Y* data, int sizeData);
+	template<typename X, typename Y>
+	extern PLOT_ID makeSeries(X skip, Y* data, int sizeData, STYLE const* style = nullptr);
 }

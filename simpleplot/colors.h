@@ -12,6 +12,7 @@ namespace SimplePlot {
 			GREEN,
 			BLUE,
 			TEAL,
+			LIGHT_PURPLE,
 			PURPLE,
 			GRAY,
 		};
@@ -27,6 +28,7 @@ namespace SimplePlot {
 	};
 
 	namespace Style {
-		const STYLE grayscale = { Color::Color::WHITE, Color::Color::WHITE, Color::Color::BLACK, Color::Color::GRAY};
+		const STYLE grayscale = { Color::Color::WHITE, Color::Color::WHITE, Color::Color::BLACK, Color::Color::GRAY };
+		const STYLE purple = { Color::Color::LIGHT_PURPLE, Color::Color::WHITE, Color::Color::PURPLE, Color::Color::GRAY };
 	}
 }

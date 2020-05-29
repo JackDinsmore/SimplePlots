@@ -24,32 +24,74 @@ namespace SimplePlot {
 	}
 
 	namespace Plot {
-		Plot::Plot(PLOT_TYPE plotType, AXIS_TYPE axisType)
-			: plotType(plotType), axisType(axisType) {
+		Plot::Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, STYLE const* style)
+			: plotType(plotType), axisType(axisType), style(style) {
 			id = maxID;
 			maxID++;
+			loadStyle(style);
+
+			numAxes = Axes::getNumAxes(axisType);
+			setAxisLimits = new float[numAxes * 2];
+			isSetAxisLimits = new bool[numAxes * 2];
+			for (int i = 0; i < numAxes * 2; i++) {
+				isSetAxisLimits[i] = 0;
+			}
 		}
 
 		Plot::~Plot() {
-			DeleteObject(foreBrush);
-			DeleteObject(backBrush);
+			unloadStyle();
 		}
 
 		void Plot::loadStyle(STYLE const* style) {
 			foreBrush = CreateSolidBrush(Color::getColor(style->foreBrushColor));
 			backBrush = CreateSolidBrush(Color::getColor(style->backBrushColor));
+			forePen = CreatePen(PS_SOLID, 2, Color::getColor(style->forePenColor));
+		}
+
+		void Plot::unloadStyle() {
+			DeleteObject(foreBrush);
+			DeleteObject(backBrush);
+			DeleteObject(forePen);
+		}
+
+		void Plot::getGeneralAxisLimits(float* axisLimits, bool set) const {
+			float* tempAxisLimits = new float[numAxes * 2];
+			getAxisLimits(tempAxisLimits);
+
+			for (int i = 0; i < numAxes * 2; i++) {
+				if (isSetAxisLimits[i]!= 0) {
+					tempAxisLimits[i] = setAxisLimits[i];
+				}
+				if (set) {
+					axisLimits[i] = tempAxisLimits[i];
+				}
+				else {
+					if (i % 2 == 0) {
+						axisLimits[i] = min(tempAxisLimits[i], axisLimits[i]);
+					}
+					else {
+						axisLimits[i] = max(tempAxisLimits[i], axisLimits[i]);
+					}
+				}
+			}
+			delete[] tempAxisLimits;
 		}
 	}
 
 	void deletePlot(PLOT_ID id) {
-		std::lock_guard<std::mutex> g(Maps::mapMutex);
+		Maps::mapMutex.lock();/// Possibly not necessary.
 		Plot::Plot* plot = Maps::plotPointerMap[id];
+		Maps::mapMutex.unlock();
+
+		if (plot->canvas != SP_NULL_CANVAS) {
+			removePlotFromCanvas(plot->canvas, id);
+		}
+
+		std::lock_guard<std::mutex> guard(Maps::mapMutex);
 		Maps::plotPointerMap.erase(id);
 		Maps::plotMutexMap.erase(id);
 		Maps::plotTypeMap.erase(id);
-		if (plot->canvas != NULL) {
-			removePlotFromCanvas(plot->canvas, id);
-		}
+
 		delete plot;
 	}
 
@@ -70,9 +112,9 @@ namespace SimplePlot {
 		return Maps::plotPointerMap.at(id)->plotType;
 	}
 
-	void getPlotAxisLimits(PLOT_ID id, float* axisLimits) {
+	void getPlotAxisLimits(PLOT_ID id, float* axisLimits, bool set) {
 		Maps::PlotGuard guard(id);
-		Maps::plotPointerMap.at(id)->getAxisLimits(axisLimits);
+		Maps::plotPointerMap.at(id)->getGeneralAxisLimits(axisLimits, set);
 	}
 
 	void isolatePlotData(PLOT_ID id) {
@@ -97,11 +139,41 @@ namespace SimplePlot {
 
 	void disassociatePlot(PLOT_ID plotID) {
 		Maps::PlotGuard guard(plotID);
-		Maps::plotPointerMap.at(plotID)->canvas = NULL;
+		Maps::plotPointerMap.at(plotID)->canvas = SP_NULL_CANVAS;
 	}
 
 	CANVAS_ID getPlotCanvas(PLOT_ID plotID) {
 		Maps::PlotGuard guard(plotID);// Necessary?
 		return Maps::plotPointerMap.at(plotID)->canvas;
+	}
+
+	void setPlotAxisLimits(PLOT_ID id, int axisNum, float lowLimit, float highLimit) {
+		Maps::PlotGuard guard(id);// Necessary?
+		Plot::Plot* ptr = Maps::plotPointerMap.at(id);
+		if (ptr->numAxes <= axisNum) {
+			return;
+		}
+		ptr->setAxisLimits[axisNum * 2] = lowLimit;
+		ptr->isSetAxisLimits[axisNum * 2] = true;
+		ptr->setAxisLimits[axisNum * 2 + 1] = highLimit;
+		ptr->isSetAxisLimits[axisNum * 2 + 1] = true;
+	}
+	void setPlotLowerAxisLimit(PLOT_ID id, int axisNum, float lowLimit) {
+		Maps::PlotGuard guard(id);// Necessary?
+		Plot::Plot* ptr = Maps::plotPointerMap.at(id);
+		if (ptr->numAxes <= axisNum) {
+			return;
+		}
+		ptr->setAxisLimits[axisNum * 2] = lowLimit;
+		ptr->isSetAxisLimits[axisNum * 2] = true;
+	}
+	void setPlotUpperAxisLimit(PLOT_ID id, int axisNum, float highLimit) {
+		Maps::PlotGuard guard(id);// Necessary?
+		Plot::Plot* ptr = Maps::plotPointerMap.at(id);
+		if (ptr->numAxes <= axisNum) {
+			return;
+		}
+		ptr->setAxisLimits[axisNum * 2 + 1] = highLimit;
+		ptr->isSetAxisLimits[axisNum * 2 + 1] = true;
 	}
 }

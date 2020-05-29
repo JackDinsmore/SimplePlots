@@ -22,6 +22,8 @@ namespace SimplePlot::Color {
 			return RGB(0, 0, 255);
 		case Color::TEAL:
 			return RGB(0, 255, 255);
+		case Color::LIGHT_PURPLE:
+			return RGB(255, 128, 255);
 		case Color::PURPLE:
 			return RGB(255, 0, 255);
 		case Color::GRAY:

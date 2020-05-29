@@ -7,7 +7,7 @@ namespace SimplePlot::Line {
 	template<typename X, typename Y>
 	class Line : public SimplePlot::Plot::Plot {
 	public:
-		Line(X* x, Y* y, int sizeX, int sizeY);
+		Line(X* xData, Y* yData, int sizeData, STYLE const* style);
 		~Line();
 
 
@@ -17,15 +17,13 @@ namespace SimplePlot::Line {
 		void isolateData() override;
 		void deleteData() override;
 
-		X* x;
-		Y* y;
-		int sizeX;
-		int sizeY;
-		bool normal;
+		X* xData;
+		Y* yData;
+		int sizeData;
 	};
 }
 
 namespace SimplePlot {
 	template<typename X, typename Y>
-	extern PLOT_ID makeLine(X* x, Y* y, int sizeX, int sizeY);
+	extern PLOT_ID makeLine(X* x, Y* y, int sizeData, STYLE const* style = nullptr);
 }
