@@ -12,3 +12,5 @@ Sometimes the graphs freeze or don't repaint the whole canvas white.
 Move the axis numbers to a more reasonable place.
 
 Create documentation
+
+Make an option to enforce that a plot be square

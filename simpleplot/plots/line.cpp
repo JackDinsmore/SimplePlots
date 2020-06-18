@@ -33,7 +33,7 @@ namespace SimplePlot::Line {
 
 		LONG x = drawSpace[0].x + ((float)xData[0] - axisLimits[0]) / (axisLimits[1] - axisLimits[0]) * (drawSpace[1].x - drawSpace[0].x);
 		LONG y = drawSpace[0].y + ((float)yData[0] - axisLimits[2]) / (axisLimits[3] - axisLimits[2]) * (drawSpace[2].y - drawSpace[0].y);
-		MoveToEx(hdc, drawSpace[0].x, y, NULL);
+		MoveToEx(hdc, x, y, NULL);
 		for (int i = 1; i < sizeData; i++) {
 			LONG x = drawSpace[0].x + ((float)xData[i] - axisLimits[0]) / (axisLimits[1] - axisLimits[0]) * (drawSpace[1].x - drawSpace[0].x);
 			LONG y = drawSpace[0].y + ((float)yData[i] - axisLimits[2]) / (axisLimits[3] - axisLimits[2]) * (drawSpace[2].y - drawSpace[0].y);
