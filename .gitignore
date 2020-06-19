@@ -1,1 +1,7 @@
 .vs/
+*.exe
+*.pdb
+*.log
+*.obj
+*.FileListAbsolute.txt
+*.tlog/
