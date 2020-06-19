@@ -8,10 +8,10 @@
 namespace SimplePlot {
 	class Axis {
 	public:
-		Axis(std::string label = "", bool logarithmic = false, SimplePlot::Color::Color backColor = SimplePlot::Color::Color::WHITE,
-			SimplePlot::Color::Color color = SimplePlot::Color::Color::BLACK);
-		Axis(std::string label, float maxT, float minT, bool logarithmic = false, SimplePlot::Color::Color backColor = SimplePlot::Color::Color::WHITE,
-			SimplePlot::Color::Color color = SimplePlot::Color::Color::BLACK);
+		Axis(std::string label = "", bool logarithmic = false, SimplePlot::Style::Color backColor = SimplePlot::Style::Color::WHITE,
+			SimplePlot::Style::Color color = SimplePlot::Style::Color::BLACK);
+		Axis(std::string label, float maxT, float minT, bool logarithmic = false, SimplePlot::Style::Color backColor = SimplePlot::Style::Color::WHITE,
+			SimplePlot::Style::Color color = SimplePlot::Style::Color::BLACK);
 		~Axis();
 
 		bool setEnds(float minT_, float maxT_);
@@ -32,8 +32,8 @@ namespace SimplePlot {
 		float major;
 		float minor;
 		std::wstring label;
-		SimplePlot::Color::Color color;
-		SimplePlot::Color::Color backColor;
+		SimplePlot::Style::Color color;
+		SimplePlot::Style::Color backColor;
 		HPEN thickPen, thinPen, backPen;
 
 		HFONT labelFont;

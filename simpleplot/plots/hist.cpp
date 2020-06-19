@@ -7,7 +7,7 @@
 
 namespace SimplePlot::Hist {
 	template<typename Y>
-	Hist<Y>::Hist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, STYLE const* style, std::wstring name, bool normal)
+	Hist<Y>::Hist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, int style, std::wstring name, bool normal)
 		: Plot(PLOT_TYPE::HISTOGRAM, AXIS_TYPE::CART_2D, style, name), data(data), sizeData(sizeData), numBins(numBins),
 		normal(normal), maxBin(maxBin), minBin(minBin) {
 		if (minBin >= maxBin) {
@@ -16,7 +16,7 @@ namespace SimplePlot::Hist {
 	}
 
 	template<typename Y>
-	Hist<Y>::Hist(Y* data, int sizeData, Y* leftBins_, int numBins, STYLE const* style, std::wstring name, bool normal)
+	Hist<Y>::Hist(Y* data, int sizeData, Y* leftBins_, int numBins, int style, std::wstring name, bool normal)
 		: Plot(PLOT_TYPE::HISTOGRAM, AXIS_TYPE::CART_2D, style, name), data(data), sizeData(sizeData), numBins(numBins), normal(normal) {
 		if (numBins > 2) {
 			throw std::invalid_argument("Num Bins must be >= 2");
@@ -64,7 +64,7 @@ namespace SimplePlot::Hist {
 		// axisLimits: {minX, maxX, minY, maxY}
 		// axisPoints: {origin, endX, endY, farCorner}
 
-		SelectObject(hdc, forePen);
+		SelectObject(hdc, style.forePen);
 
 		int* binCounts = new int[numBins];
 		for (int i = 0; i < numBins; i++) {
@@ -101,7 +101,7 @@ namespace SimplePlot::Hist {
 			LONG height = float(binCounts[binNum] - minCount) / (maxCount - minCount) * (origin.y - endY.y);
 			RECT rect = { LONG(origin.x + pixelsPerBin * binNum), origin.y - height,
 				LONG(origin.x + pixelsPerBin * (binNum + 1)), origin.y };
-			FillRect(hdc, &rect, foreBrush);
+			FillRect(hdc, &rect, style.foreBrush);
 			LineTo(hdc, rect.left, rect.top);
 			LineTo(hdc, rect.right, rect.top);
 		}
@@ -130,10 +130,7 @@ namespace SimplePlot::Hist {
 
 namespace SimplePlot {
 	template<typename Y>
-	PLOT_ID makeHist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, STYLE const* style, std::wstring name, bool normal) {
-		if (!style) {
-			style = &Style::grayscale;
-		}
+	PLOT_ID makeHist(Y* data, int sizeData, int numBins, Y minBin, Y maxBin, int style, std::wstring name, bool normal) {
 		SimplePlot::Plot::Plot* plt = new SimplePlot::Hist::Hist(data, sizeData, numBins, minBin, maxBin, style, name, normal);
 		PLOT_ID id = plt->id;
 		registerPlot(id, plt, PLOT_TYPE::HISTOGRAM);
@@ -141,21 +138,18 @@ namespace SimplePlot {
 	}
 
 	template<typename Y>
-	PLOT_ID makeHist(Y* data, int sizeData, Y* leftBins, int numBins, STYLE const* style, std::wstring name, bool normal) {
-		if (!style) {
-			style = &Style::grayscale;
-		}
+	PLOT_ID makeHist(Y* data, int sizeData, Y* leftBins, int numBins, int style, std::wstring name, bool normal) {
 		SimplePlot::Plot::Plot* plt = new SimplePlot::Hist::Hist(data, sizeData, leftBins, numBins, style, name, normal);
 		PLOT_ID id = plt->id;
 		registerPlot(id, plt, PLOT_TYPE::HISTOGRAM);
 		return id;
 	}
 
-	template PLOT_ID makeHist<float>(float* data, int sizeData, int numBins, float minBin, float maxBin, STYLE const* style, std::wstring name, bool normal);
-	template PLOT_ID makeHist<double>(double* data, int sizeData, int numBins, double minBin, double maxBin, STYLE const* style, std::wstring name, bool normal);
-	template PLOT_ID makeHist<int>(int* data, int sizeData, int numBins, int minBin, int maxBin, STYLE const* style, std::wstring name, bool normal);
+	template PLOT_ID makeHist<float>(float* data, int sizeData, int numBins, float minBin, float maxBin, int style, std::wstring name, bool normal);
+	template PLOT_ID makeHist<double>(double* data, int sizeData, int numBins, double minBin, double maxBin, int style, std::wstring name, bool normal);
+	template PLOT_ID makeHist<int>(int* data, int sizeData, int numBins, int minBin, int maxBin, int style, std::wstring name, bool normal);
 
-	template PLOT_ID makeHist<float>(float* data, int sizeData, float* leftBins, int numBins, STYLE const* style, std::wstring name, bool normal);
-	template PLOT_ID makeHist<double>(double* data, int sizeData, double* leftBins, int numBins, STYLE const* style, std::wstring name, bool normal);
-	template PLOT_ID makeHist<int>(int* data, int sizeData, int* leftBins, int numBins, STYLE const* style, std::wstring name, bool normal);
+	template PLOT_ID makeHist<float>(float* data, int sizeData, float* leftBins, int numBins, int style, std::wstring name, bool normal);
+	template PLOT_ID makeHist<double>(double* data, int sizeData, double* leftBins, int numBins, int style, std::wstring name, bool normal);
+	template PLOT_ID makeHist<int>(int* data, int sizeData, int* leftBins, int numBins, int style, std::wstring name, bool normal);
 }

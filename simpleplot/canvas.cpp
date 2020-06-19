@@ -28,7 +28,7 @@ namespace SimplePlot {
 	}
 
 	namespace Canvas {
-		Canvas::Canvas(std::vector<PLOT_ID> plots_, std::wstring name, SimplePlot::STYLE const* style) : name(name), style(style) {
+		Canvas::Canvas(std::vector<PLOT_ID> plots_, std::wstring name, int style) : name(name), style(style) {
 			id = maxID;
 			maxID++;
 
@@ -45,11 +45,6 @@ namespace SimplePlot {
 			}
 
 			setAxisType();
-
-			if (!style) {
-				style = &Style::grayscale;
-			}
-			backBrush = CreateSolidBrush(Color::getColor(style->backBrushColor));
 		}
 
 		Canvas::~Canvas() {
@@ -57,7 +52,6 @@ namespace SimplePlot {
 			delete[] axisLimits;
 			delete[] drawSpace;
 			delete[] axes;
-			DeleteObject(backBrush);
 		}
 
 		void Canvas::initWindow() {
@@ -128,8 +122,8 @@ namespace SimplePlot {
 
 			SelectObject(hdcBmp, hwndToBitmap[hwnd]);
 
-			HBRUSH oldBrush = (HBRUSH)SelectObject(hdcBmp, backBrush);
-			FillRect(hdcBmp, &r, backBrush);
+			HBRUSH oldBrush = (HBRUSH)SelectObject(hdcBmp, style.backBrush);
+			FillRect(hdcBmp, &r, style.backBrush);
 			SetBkMode(hdcBmp, TRANSPARENT);
 
 			draw(hdcBmp);
@@ -351,11 +345,8 @@ namespace SimplePlot {
 	}
 
 
-	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, std::wstring name, SimplePlot::STYLE const* style) {
+	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, std::wstring name, int style) {
 		// Spawn the update function in a new thread.
-		if (!style) {
-			style = &Style::grayscale;
-		}
 		Canvas::Canvas* canvas = new Canvas::Canvas(plots, name, style);
 		std::thread(&Canvas::Canvas::launch, canvas).detach();
 		CANVAS_ID id = canvas->id;

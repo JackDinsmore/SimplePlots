@@ -6,7 +6,6 @@
 #include <mutex>
 
 
-
 namespace SimplePlot {
 	namespace Maps {
 		std::map<PLOT_ID, SimplePlot::Plot::Plot*> plotPointerMap;
@@ -24,11 +23,10 @@ namespace SimplePlot {
 	}
 
 	namespace Plot {
-		Plot::Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, STYLE const* style, std::wstring name)
+		Plot::Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, int style, std::wstring name)
 			: plotType(plotType), axisType(axisType), style(style), name(name) {
 			id = maxID;
 			maxID++;
-			loadStyle(style);
 
 			numAxes = Axes::getNumAxes(axisType);
 			setAxisLimits = new float[numAxes * 2];
@@ -36,22 +34,6 @@ namespace SimplePlot {
 			for (int i = 0; i < numAxes * 2; i++) {
 				isSetAxisLimits[i] = 0;
 			}
-		}
-
-		Plot::~Plot() {
-			unloadStyle();
-		}
-
-		void Plot::loadStyle(STYLE const* style) {
-			foreBrush = CreateSolidBrush(Color::getColor(style->foreBrushColor));
-			backBrush = CreateSolidBrush(Color::getColor(style->backBrushColor));
-			forePen = CreatePen(PS_SOLID, 2, Color::getColor(style->forePenColor));
-		}
-
-		void Plot::unloadStyle() {
-			DeleteObject(foreBrush);
-			DeleteObject(backBrush);
-			DeleteObject(forePen);
 		}
 
 		void Plot::getGeneralAxisLimits(float* axisLimits, bool set) const {
@@ -78,7 +60,7 @@ namespace SimplePlot {
 		}
 
 		void Plot::drawLegend(HDC hdc, RECT legendRect) {
-			SelectObject(hdc, forePen);
+			SelectObject(hdc, style.forePen);
 			MoveToEx(hdc, legendRect.left, legendRect.top + 15, NULL);
 			LineTo(hdc, legendRect.left + 15, legendRect.top + 15);
 			legendRect.left += 20;

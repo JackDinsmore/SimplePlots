@@ -10,12 +10,11 @@ namespace SimplePlot {
 	namespace Plot {
 		class Plot {
 		public:
-			Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, STYLE const* style, std::wstring name);
+			Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, int style, std::wstring name);
 			Plot(const Plot&) = delete;
 			Plot(Plot&&) = delete;
 			Plot& operator=(Plot const&) = delete;
 			Plot& operator=(Plot&&) = delete;
-			~Plot();
 
 			virtual void isolateData() = 0;
 			virtual void deleteData() = 0;
@@ -35,16 +34,10 @@ namespace SimplePlot {
 			std::wstring name;
 
 		protected:
-			HBRUSH foreBrush;
-			HBRUSH backBrush;
-			HPEN forePen;
+			SimplePlot::Style::Style style;
 
 		private:
 			inline static PLOT_ID maxID = 0;
-
-			void loadStyle(STYLE const* style);
-			void unloadStyle();
-			SimplePlot::STYLE const* style;
 		};
 	}
 

@@ -10,7 +10,7 @@ namespace SimplePlot {
 	namespace Canvas {
 		class Canvas {
 		public:
-			Canvas(std::vector<PLOT_ID> plots_, std::wstring name, STYLE const* style);
+			Canvas(std::vector<PLOT_ID> plots_, std::wstring name, int style);
 			~Canvas();
 
 			void setPos(int x, int y);
@@ -43,7 +43,6 @@ namespace SimplePlot {
 
 			inline static CANVAS_ID maxID;
 
-			HBRUSH backBrush;
 			std::vector<PLOT_ID> plots;
 			int framerate = SP_DYNAMIC;
 			AXIS_TYPE axisType;
@@ -58,11 +57,11 @@ namespace SimplePlot {
 			std::vector<std::wstring> plotNames;
 
 			bool killed = false;
-			SimplePlot::STYLE const* style;
+			SimplePlot::Style::Style style;
 		};
 	}
 
-	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, std::wstring name = L"", SimplePlot::STYLE const* style = nullptr);
+	CANVAS_ID makeCanvas(std::vector<PLOT_ID> plots, std::wstring name = L"", int style = 0);
 	void deleteCanvas(CANVAS_ID id);
 	void addPlotToCanvas(CANVAS_ID canvasID, PLOT_ID plotID);
 	void removePlotFromCanvas(CANVAS_ID canvasID, PLOT_ID plotID);

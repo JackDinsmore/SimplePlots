@@ -8,12 +8,12 @@
 
 
 namespace SimplePlot {
-	Axis::Axis(std::string label, bool logarithmic, SimplePlot::Color::Color backColor, SimplePlot::Color::Color color)
+	Axis::Axis(std::string label, bool logarithmic, SimplePlot::Style::Color backColor, SimplePlot::Style::Color color)
 		: label(label.begin(), label.end()), logarithmic(logarithmic), backColor(backColor), fixEnds(false), color(color) {
 		makePen();
 	}
 
-	Axis::Axis(std::string label, float maxT, float minT, bool logarithmic, SimplePlot::Color::Color backColor, SimplePlot::Color::Color color)
+	Axis::Axis(std::string label, float maxT, float minT, bool logarithmic, SimplePlot::Style::Color backColor, SimplePlot::Style::Color color)
 		: label(label.begin(), label.end()), logarithmic(logarithmic), backColor(backColor), maxT(maxT), minT(minT), fixEnds(true) {
 		makePen();
 	}
@@ -40,10 +40,10 @@ namespace SimplePlot {
 	}
 
 	void Axis::makePen() {
-		thickPen = CreatePen(PS_SOLID, 2, Color::getColor(color));
-		thinPen = CreatePen(PS_SOLID, 1, Color::getColor(color));
-		COLORREF backCR = Color::getColor(backColor);
-		COLORREF foreCR = Color::getColor(color);
+		thickPen = CreatePen(PS_SOLID, 2, Style::getColor(color));
+		thinPen = CreatePen(PS_SOLID, 1, Style::getColor(color));
+		COLORREF backCR = Style::getColor(backColor);
+		COLORREF foreCR = Style::getColor(color);
 		COLORREF penCR = RGB((GetRValue(backCR) + GetRValue(foreCR)) / 2, (GetGValue(backCR) + GetGValue(foreCR)) / 2, (GetBValue(backCR) + GetBValue(foreCR)) / 2);
 		backPen = CreatePen(PS_SOLID, 1, penCR);
 
