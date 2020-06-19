@@ -7,8 +7,8 @@
 
 namespace SimplePlot::Line {
 	template<typename X, typename Y>
-	Line<X, Y>::Line(X* xData, Y* yData, int sizeData, STYLE const* style)
-		: Plot(PLOT_TYPE::LINE, AXIS_TYPE::CART_2D, style), xData(xData), yData(yData), sizeData(sizeData) {
+	Line<X, Y>::Line(X* xData, Y* yData, int sizeData, STYLE const* style, std::wstring name)
+		: Plot(PLOT_TYPE::LINE, AXIS_TYPE::CART_2D, style, name), xData(xData), yData(yData), sizeData(sizeData) {
 	}
 
 	template<typename X, typename Y>
@@ -40,6 +40,8 @@ namespace SimplePlot::Line {
 			LineTo(hdc, x, y);
 		}
 	}
+
+
 
 	template<typename X, typename Y>
 	void Line<X, Y>::isolateData() {
@@ -74,23 +76,23 @@ namespace SimplePlot::Line {
 
 namespace SimplePlot {
 	template<typename X, typename Y>
-	PLOT_ID makeLine(X* x, Y* y, int sizeData, STYLE const* style) {
+	PLOT_ID makeLine(X* x, Y* y, int sizeData, STYLE const* style, std::wstring name) {
 		if (!style) {
 			style = &Style::grayscale;
 		}
-		SimplePlot::Plot::Plot* plt = new SimplePlot::Line::Line(x, y, sizeData, style);
+		SimplePlot::Plot::Plot* plt = new SimplePlot::Line::Line(x, y, sizeData, style, name);
 		PLOT_ID id = plt->id;
 		registerPlot(id, plt, PLOT_TYPE::LINE);
 		return id;
 	}
 
-	template PLOT_ID makeLine<float, float>(float* x, float* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<double, float>(double* x, float* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<int, float>(int* x, float* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<float, double>(float* x, double* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<double, double>(double* x, double* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<int, double>(int* x, double* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<float, int>(float* x, int* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<double, int>(double* x, int* y, int sizeData, STYLE const* style);
-	template PLOT_ID makeLine<int, int>(int* x, int* y, int sizeData, STYLE const* style);
+	template PLOT_ID makeLine<float, float>(float* x, float* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<double, float>(double* x, float* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<int, float>(int* x, float* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<float, double>(float* x, double* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<double, double>(double* x, double* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<int, double>(int* x, double* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<float, int>(float* x, int* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<double, int>(double* x, int* y, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeLine<int, int>(int* x, int* y, int sizeData, STYLE const* style, std::wstring name);
 }

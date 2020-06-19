@@ -24,8 +24,8 @@ namespace SimplePlot {
 	}
 
 	namespace Plot {
-		Plot::Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, STYLE const* style)
-			: plotType(plotType), axisType(axisType), style(style) {
+		Plot::Plot(PLOT_TYPE plotType, AXIS_TYPE axisType, STYLE const* style, std::wstring name)
+			: plotType(plotType), axisType(axisType), style(style), name(name) {
 			id = maxID;
 			maxID++;
 			loadStyle(style);
@@ -59,7 +59,7 @@ namespace SimplePlot {
 			getAxisLimits(tempAxisLimits);
 
 			for (int i = 0; i < numAxes * 2; i++) {
-				if (isSetAxisLimits[i]!= 0) {
+				if (isSetAxisLimits[i] != 0) {
 					tempAxisLimits[i] = setAxisLimits[i];
 				}
 				if (set) {
@@ -75,6 +75,14 @@ namespace SimplePlot {
 				}
 			}
 			delete[] tempAxisLimits;
+		}
+
+		void Plot::drawLegend(HDC hdc, RECT legendRect) {
+			SelectObject(hdc, forePen);
+			MoveToEx(hdc, legendRect.left, legendRect.top + 15, NULL);
+			LineTo(hdc, legendRect.left + 15, legendRect.top + 15);
+			legendRect.left += 20;
+			DrawText(hdc, name.c_str(), (int)name.size(), &legendRect, NULL);
 		}
 	}
 
@@ -132,6 +140,11 @@ namespace SimplePlot {
 		Maps::plotPointerMap.at(id)->draw(hdc, axisLimits, drawSpace);
 	}
 
+	void drawPlotLegend(PLOT_ID id, HDC hdc, RECT legendRect) {
+		Maps::PlotGuard guard(id);
+		Maps::plotPointerMap.at(id)->drawLegend(hdc, legendRect);
+	}
+
 	void associatePlot(PLOT_ID plotID, CANVAS_ID canvasID) {
 		Maps::PlotGuard guard(plotID);
 		Maps::plotPointerMap.at(plotID)->canvas = canvasID;
@@ -175,5 +188,9 @@ namespace SimplePlot {
 		}
 		ptr->setAxisLimits[axisNum * 2 + 1] = highLimit;
 		ptr->isSetAxisLimits[axisNum * 2 + 1] = true;
+	}
+	std::wstring getPlotName(PLOT_ID id) {
+		Maps::PlotGuard guard(id);
+		return Maps::plotPointerMap.at(id)->name;
 	}
 }

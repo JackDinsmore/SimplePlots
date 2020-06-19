@@ -7,7 +7,7 @@ namespace SimplePlot::Series {
 	template<typename X, typename Y>
 	class Series : public SimplePlot::Plot::Plot {
 	public:
-		Series(X skip, Y* data, int sizeData, STYLE const* style);
+		Series(X skip, Y* data, int sizeData, STYLE const* style, std::wstring name);
 		~Series();
 
 
@@ -25,5 +25,5 @@ namespace SimplePlot::Series {
 
 namespace SimplePlot {
 	template<typename X, typename Y>
-	extern PLOT_ID makeSeries(X skip, Y* data, int sizeData, STYLE const* style = nullptr);
+	extern PLOT_ID makeSeries(X skip, Y* data, int sizeData, STYLE const* style = nullptr, std::wstring name = L"");
 }

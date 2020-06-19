@@ -57,7 +57,6 @@ namespace SimplePlot {
 					int debug = 0;
 				}
 
-				InvalidateRect(hwnd, &r, FALSE);
 				break;
 
 			case WM_ERASEBKGND:

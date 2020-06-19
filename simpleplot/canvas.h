@@ -30,6 +30,8 @@ namespace SimplePlot {
 
 			HWND hwnd;
 			CANVAS_ID id = SP_NULL_CANVAS;
+			bool legend = false;
+			bool enforceSquare = false;
 
 		private:
 			void initWindow();
@@ -53,6 +55,7 @@ namespace SimplePlot {
 			float* axisLimits;
 			POINT* drawSpace;
 			std::wstring name;
+			std::vector<std::wstring> plotNames;
 
 			bool killed = false;
 			SimplePlot::STYLE const* style;
@@ -65,4 +68,6 @@ namespace SimplePlot {
 	void removePlotFromCanvas(CANVAS_ID canvasID, PLOT_ID plotID);
 	void setCanvasGridLines(CANVAS_ID canvasID, bool state);
 	void setCanvasFramerate(CANVAS_ID id, int framerate);
+	void setCanvasLegend(CANVAS_ID id, bool legend);
+	void setCanvasEnforceSquare(CANVAS_ID id, bool sq);
 }

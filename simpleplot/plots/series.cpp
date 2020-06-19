@@ -7,8 +7,8 @@
 
 namespace SimplePlot::Series {
 	template<typename X, typename Y>
-	Series<X, Y>::Series(X skip, Y* data, int sizeData, STYLE const* style)
-		: Plot(PLOT_TYPE::SERIES, AXIS_TYPE::CART_2D, style), skip(skip), data(data), sizeData(sizeData) {
+	Series<X, Y>::Series(X skip, Y* data, int sizeData, STYLE const* style, std::wstring name)
+		: Plot(PLOT_TYPE::SERIES, AXIS_TYPE::CART_2D, style, name), skip(skip), data(data), sizeData(sizeData) {
 	}
 
 	template<typename X, typename Y>
@@ -67,23 +67,23 @@ namespace SimplePlot::Series {
 
 namespace SimplePlot {
 	template<typename X, typename Y>
-	PLOT_ID makeSeries(X skip, Y* data, int sizeData, STYLE const* style) {
+	PLOT_ID makeSeries(X skip, Y* data, int sizeData, STYLE const* style, std::wstring name) {
 		if (!style) {
 			style = &Style::grayscale;
 		}
-		SimplePlot::Plot::Plot* plt = new SimplePlot::Series::Series(skip, data, sizeData, style);
+		SimplePlot::Plot::Plot* plt = new SimplePlot::Series::Series(skip, data, sizeData, style, name);
 		PLOT_ID id = plt->id;
 		registerPlot(id, plt, PLOT_TYPE::SERIES);
 		return id;
 	}
 
-	template PLOT_ID makeSeries<float, float>(float skip, float* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<float, double>(float skip, double* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<float, int>(float skip, int* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<double, float>(double skip, float* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<double, double>(double skip, double* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<double, int>(double skip, int* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<int, float>(int skip, float* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<int, double>(int skip, double* data, int sizeData, STYLE const* style);
-	template PLOT_ID makeSeries<int, int>(int skip, int* data, int sizeData, STYLE const* style);
+	template PLOT_ID makeSeries<float, float>(float skip, float* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<float, double>(float skip, double* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<float, int>(float skip, int* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<double, float>(double skip, float* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<double, double>(double skip, double* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<double, int>(double skip, int* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<int, float>(int skip, float* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<int, double>(int skip, double* data, int sizeData, STYLE const* style, std::wstring name);
+	template PLOT_ID makeSeries<int, int>(int skip, int* data, int sizeData, STYLE const* style, std::wstring name);
 }

@@ -1,11 +1,1 @@
-﻿  simpleplot.cpp
-  axis.cpp
-  canvas.cpp
-  colors.cpp
-  hist.cpp
-  line.cpp
-  plot.cpp
-  series.cpp
-  stats.cpp
-  wndProc.cpp
-  SimplePlot.vcxproj -> C:\Users\goods\Desktop\Projects\Physics\SimplePlot\x64\Release\SimplePlot.lib
+﻿  SimplePlot.vcxproj -> C:\Users\goods\Desktop\Projects\Physics\SimplePlot\x64\Release\SimplePlot.lib

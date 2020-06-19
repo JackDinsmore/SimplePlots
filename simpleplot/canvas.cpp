@@ -138,6 +138,8 @@ namespace SimplePlot {
 
 			DeleteDC(hdcBmp);
 			ReleaseDC(NULL, hdcScreen);
+
+			InvalidateRect(hwnd, &r, FALSE);
 		}
 
 		void Canvas::createBitmap() {
@@ -156,8 +158,7 @@ namespace SimplePlot {
 		}
 
 		void Canvas::setSize(int cx, int cy) {
-			POINT p = getPos();
-			MoveWindow(hwnd, p.x, p.y, cx, cy, TRUE);
+			SetWindowPos(hwnd, 0, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOMOVE | SWP_DEFERERASE);
 		}
 
 		void Canvas::rename(std::string s) {
@@ -166,7 +167,7 @@ namespace SimplePlot {
 
 		POINT Canvas::getSize() {
 			RECT rect;
-			GetClientRect(hwnd, &rect);
+			GetWindowRect(hwnd, &rect);//GetClientRect(hwnd, &rect);
 			return { rect.right - rect.left, rect.bottom - rect.top };
 		}
 
@@ -199,6 +200,7 @@ namespace SimplePlot {
 
 			if (plots.size() == 0) {
 				plots.push_back(plotID);
+				plotNames.push_back(getPlotName(plotID));
 				axisType = getPlotAxisType(plotID);
 				setAxisType();
 				return;
@@ -224,13 +226,16 @@ namespace SimplePlot {
 			}
 			if (beginOrder != thisOrder) {
 				if (beginOrder < thisOrder) {
+					plotNames.insert(plotNames.begin() + int(begin - plots.begin()), getPlotName(plotID));
 					plots.insert(begin, plotID);
 				}
 				else {
-					plots.insert(end+1, plotID);
+					plotNames.insert(plotNames.begin() + int(end + 1 - plots.begin()), getPlotName(plotID));
+					plots.insert(end + 1, plotID);
 				}
 			}
 			else {
+				plotNames.insert(plotNames.begin() + int(begin - plots.begin()), getPlotName(plotID));
 				plots.insert(begin, plotID);
 			}
 		}
@@ -242,7 +247,9 @@ namespace SimplePlot {
 				return;
 			}
 			disassociatePlot(plotID);
+			plotNames.erase(plotNames.begin() + int(it - plots.begin()));
 			plots.erase(it);
+
 		}
 
 		void Canvas::setAxisType() {
@@ -289,6 +296,33 @@ namespace SimplePlot {
 
 			RECT nameRect = { 0, 0, size.x, 80 };
 			DrawText(hdc, name.c_str(), name.size(), &nameRect, DT_CENTER);
+
+			if (legend) {
+				RECT legendRect = { SP_BORDER_WIDTH + 10, SP_BORDER_WIDTH + 10, 0, SP_BORDER_WIDTH + 40, };
+				for (std::wstring s : plotNames) {
+					RECT textRect = { 0, 0, 0, 0 };
+					DrawText(hdc, s.c_str(), s.size(), &textRect, DT_CALCRECT);
+					legendRect.right = legendRect.left + max(legendRect.right - legendRect.left, textRect.right);
+				}
+				legendRect.right += 20;
+				for (int i = 0; i < plots.size(); i++) {
+					drawPlotLegend(plots[i], hdc, legendRect);
+					legendRect.top += 30;
+					legendRect.bottom += 30;
+				}
+			}
+
+			if (enforceSquare) {
+				POINT s = getSize();
+				int bufferx = SP_BORDER_WIDTH;/// I should fix these later; they're not totally correct.
+				int buffery = SP_BORDER_WIDTH;
+				float aspect = (axisLimits[1] - axisLimits[0]) / (axisLimits[3] - axisLimits[2]);// x / y
+				if (1 / SP_MAX_ASPECT < aspect && aspect < SP_MAX_ASPECT) {
+					float scale = (s.x + s.y - bufferx - buffery) / (aspect + 1);
+					int parity = s.x + s.y - (int(bufferx + scale * aspect) + int(buffery + scale));
+					setSize(int(bufferx + scale * aspect) + parity, int(buffery + scale));
+				}
+			}
 		}
 
 		void Canvas::kill() {
@@ -354,5 +388,14 @@ namespace SimplePlot {
 	void setCanvasFramerate(CANVAS_ID id, int framerate) {
 		Maps::CanvasGuard guard(id);
 		Maps::canvasPointerMap.at(id)->setFramerate(framerate);
+	}
+	void setCanvasLegend(CANVAS_ID id, bool legend) {
+		Maps::CanvasGuard guard(id);
+		Maps::canvasPointerMap.at(id)->legend = legend;
+	}
+	void setCanvasEnforceSquare(CANVAS_ID id, bool sq) {
+		Maps::CanvasGuard guard(id);// Necessary?
+		Canvas::Canvas* ptr = Maps::canvasPointerMap.at(id);
+		ptr->enforceSquare = sq;
 	}
 }

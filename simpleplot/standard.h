@@ -12,6 +12,7 @@
 #define SP_X_AXIS 0
 #define SP_Y_AXIS 1
 #define SP_Z_AXIS 2
+#define SP_MAX_ASPECT 5
 
 
 namespace SimplePlot {
